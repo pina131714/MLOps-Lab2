@@ -1,4 +1,4 @@
-
+[![MLOps Lab 1 CI Pipeline](https://github.com/pina131714/MLOps-Lab1/actions/workflows/ci.yml/badge.svg)](https://github.com/pina131714/MLOps-Lab1/actions/workflows/ci.yml)
 
 # MLOps-Lab1: Image Preprocessing and Prediction API
 
