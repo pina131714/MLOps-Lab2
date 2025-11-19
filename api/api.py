@@ -1,7 +1,6 @@
 # Import the libraries, classes and functions
 import uvicorn
 import io
-import json
 import numpy as np
 from PIL import Image
 from fastapi import FastAPI, Form, File, UploadFile, HTTPException
@@ -40,7 +39,8 @@ async def load_image_from_uploadfile(file: UploadFile) -> Image.Image:
         image = Image.open(io.BytesIO(contents))
         return image
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid image file: {e}")
+        # Pylint Fix (W0707): Explicit exception chaining
+        raise HTTPException(status_code=400, detail=f"Invalid image file: {e}") from e
 
 
 # --- Endpoints ---
@@ -62,7 +62,8 @@ async def predict(file: UploadFile = File(...)):
         prediction = predict_image(image)
         return {"prediction": prediction}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Pylint Fix (W0707): Explicit exception chaining
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/resize", response_class=StreamingResponse)
@@ -87,21 +88,23 @@ async def resize(
         
         return StreamingResponse(buffer, media_type="image/jpeg")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Pylint Fix (W0707): Explicit exception chaining
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/info")
-async def info(file: UploadFile = File(...)):
+async def info_endpoint(file: UploadFile = File(...)): # Pylint Fix (W0621): Renamed function
     """
     Gets metadata from an image (size, mode, format, etc.).
     Expects 'multipart/form-data' with a 'file' field.
     """
     try:
         image = await load_image_from_uploadfile(file)
-        info = get_image_info(image)
-        return info
+        image_info = get_image_info(image) # Pylint Fix (W0621): Renamed variable
+        return image_info
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Pylint Fix (W0707): Explicit exception chaining
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/grayscale", response_class=StreamingResponse)
@@ -121,7 +124,8 @@ async def grayscale(file: UploadFile = File(...)):
         
         return StreamingResponse(buffer, media_type="image/png")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Pylint Fix (W0707): Explicit exception chaining
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/rotate", response_class=StreamingResponse)
@@ -145,7 +149,8 @@ async def rotate(
         
         return StreamingResponse(buffer, media_type="image/png")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Pylint Fix (W0707): Explicit exception chaining
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/blur", response_class=StreamingResponse)
@@ -168,7 +173,8 @@ async def blur(
         
         return StreamingResponse(buffer, media_type="image/jpeg")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Pylint Fix (W0707): Explicit exception chaining
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/normalize")
@@ -191,7 +197,8 @@ async def normalize(file: UploadFile = File(...)):
             "max": float(np.max(norm_array)),
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Pylint Fix (W0707): Explicit exception chaining
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 # Entry point (for direct execution only)

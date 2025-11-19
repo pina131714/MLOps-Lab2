@@ -10,7 +10,7 @@ from PIL import Image, ImageFilter
 CLASS_NAMES = ["cat", "dog", "bird", "tree", "bicycle"]
 
 
-def predict_image(image: Image.Image) -> str:
+def predict_image(image: Image.Image) -> str: # pylint: disable=W0613
     """
     Predicts the class of a given image.
 
