@@ -38,7 +38,7 @@ MLOps-Lab1/
 │   ├── test_logic.py          # Unit tests for the core logic
 │   └── __init__.py
 ├── Dockerfile                 # Added for containerization
-├── Makefile                   # Automation scripts (install, format, lint, test) / Updated with Docker targets
+├── Makefile                   # Automation scripts (install, format, lint, test)
 ├── pyproject.toml             # Dependency management (used by uv)
 └── README.md                  # This file
 ```
