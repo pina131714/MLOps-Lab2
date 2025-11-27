@@ -1,21 +1,26 @@
-[![CI](https://github.com/pina131714/MLOps-Lab1/actions/workflows/CI.yml/badge.svg)](https://github.com/pina131714/MLOps-Lab1/actions/workflows/CI.yml)
+[![CICD](https://github.com/pina131714/MLOps-Lab2/actions/workflows/CICD.yml/badge.svg)](https://github.com/pina131714/MLOps-Lab2/actions/workflows/CICD.yml)
 
-# MLOps-Lab1: Image Preprocessing and Prediction API
-
+# MLOps-Lab2: Image Processing CI/CD Pipeline
 ## Project Overview
-This repository contains the foundational components for a machine learning project, developed as the first assignment for the MLOps course. The primary objective is to implement Continuous Integration (CI) using GitHub Actions and develop the initial application logic for image processing and prediction.
-The project is structured into three main modules:
-1. Core Logic (`mylib`): Python functions for image processing tasks (resize, rotate, normalize, etc.) and a placeholder prediction function.
-2. Command Line Interface (`cli`): A wrapper using `click` to expose core logic functions via the terminal.
-3. API (`api`): A web service built with FastAPI to expose image processing endpoints via HTTP.
+This repository continues the work from Lab 1 and implements a Continuous Integration and Continuous Delivery (CI/CD) pipeline. The primary goal of Lab 2 is to deploy the image prediction application into production environments.
+The project is containerized and deployed in two key locations:
+1. API Backend: Containerized with Docker and deployed to Render.
+2. GUI Frontend: A Gradio application deployed to Hugging Face Spaces.
+
+### Key Changes from Lab 1:
+- Dockerization: Project includes a multi-stage `Dockerfile`.
+- Deployment: Added jobs for pushing the Docker image to Docker Hub and triggering Render deployment.
+- Gradio GUI: A separate `hf-space` branch contains the Gradio application (`app.py` and `requirements.txt`).
+- CI/CD Workflow: The pipeline now manages testing, Docker building, and deployment across multiple platforms.
 
 ## Project Structure
-The project follows the structure recommended in the assignment:
+The project maintains the core application structure while adding deployment assets:
+
 ```text
 MLOps-Lab1/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml             # GitHub Actions CI workflow
+│       └── CICD.yml           # Full CI/CD Workflow (Replaces old CI.yml)
 ├── api/
 │   ├── api.py                 # FastAPI application and endpoints
 │   └── __init__.py
@@ -32,30 +37,33 @@ MLOps-Lab1/
 │   ├── test_cli.py            # Tests for the CLI commands
 │   ├── test_logic.py          # Unit tests for the core logic
 │   └── __init__.py
-├── Makefile                   # Automation scripts (install, format, lint, test)
+├── Dockerfile                 # Added for containerization
+├── Makefile                   # Automation scripts (install, format, lint, test) / Updated with Docker targets
 ├── pyproject.toml             # Dependency management (used by uv)
 └── README.md                  # This file
 ```
 
 ## Setup and Installation
-### Prerequisites
-You must have Git and the `uv` package manager installed globally.
+### Prerequisites:
+You must have Git, the `uv` package manager, and Docker installed globally.
 
-### Local Setup
-1. Clone the Repository:
+## Local Setup:
+Clone the Repository (Lab 2):
 ```bash
-git clone [https://github.com/pina131714/MLOps-Lab1.git](https://github.com/pina131714/MLOps-Lab1.git)
-cd MLOps-Lab1
+git clone https://github.com/pina131714/MLOps-Lab2.git
+cd MLOps-Lab2
 ```
-2. Run Makefile `install` target: The `Makefile` simplifies environment setup by synchronizing the virtual environment (```.venv```) and installing all dependencies defined in ```pyproject.toml```.
+
+Run Makefile `install` target: The `Makefile` simplifies environment setup by synchronizing the virtual environment (`.venv`) and installing all dependencies defined in `pyproject.toml`.
 ```bash
 make install
 ```
-This command executes: `uv sync`
+
+This command executes: `uv sync 
 
 ## Usage
-### 1. Command Line Interface (CLI)
-The CLI can be used to run any of the core logic functions directly.
+1. Command Line Interface (CLI)
+The CLI still functions for local testing and debugging:
 
 | Command | Description | Example |
 | :--- | :--- | :--- |
@@ -66,26 +74,13 @@ The CLI can be used to run any of the core logic functions directly.
 | `rotate` | Rotates the image by an angle. | `uv run python -m cli.cli rotate tiger.jpg 90 -o rotated.jpg` |
 | `normalize` | Normalizes pixel values to [0, 1]. | `uv run python -m cli.cli normalize tiger.jpg` |
 
-### 2. FastAPI Web API
-
-The API runs on `uvicorn` and accepts image uploads and form data.
-
-1.  **Start the API Server:**
-    ```bash
-    uv run python -m api.api
-    ```
-
-2.  **Access Documentation:**
-    Open your browser to `http://0.0.0.0:8000/docs` to see the Swagger UI and interact with the endpoints.
-
-Key Endpoints:
-POST /predict: Requires a file upload; returns a random prediction.
-POST /resize: Requires a file upload, width (Form), and height (Form); returns the resized image.
-POST /grayscale: Requires a file upload; returns the grayscale image.
-
+2. Deployed Services
+The primary interaction points for the application are the deployed services:
+- API (Backend): Accessible via your Render public URL (e.g., `https://mlops-lab2-api.onrender.com/docs`).  
+- GUI (Frontend): Accessible via your Hugging Face Space URL (e.g., `https://huggingface.co/spaces/pina131714/mlops-lab2-gui`).
 
 ## Testing
-The project includes unit and integration tests for all components (logic, CLI and API).
+The project includes unit and integration tests for all components (logic, CLI and API). The project maintains the same testing standards from Lab 1.
 
 ### Running Tests
 Use the `Makefile` to run the test suite:
@@ -94,28 +89,25 @@ make test
 ```
 This command executes: `uv run pytest tests/ -vv --cov=mylib --cov=api --cov=cli`
 
+## Continuous Integration / Continuous Delivery (CI/CD)
+The pipeline is managed by the `CICD.yml` workflow, which ensures code quality and automatic deployment.
 
-## Continuous Integration (CI)
-The main objective of this assignment is implemented by setting up a CI pipeline using GitHub Actions.
+### CI/CD Pipeline Status
+The badge above reflects the status of the CICD workflow, which encompasses all tests and deployment jobs.
 
-### CI Pipeline Status
-
-The status badge below indicates the current state of the automated tests and checks for the `main` branch.
-
-![CI Status](https://github.com/pina131714/MLOps-Lab1/actions/workflows/ci.yml/badge.svg)
-
-### Automated Pipeline (`ci.yml`)
-
-The CI workflow is defined in the `.github/workflows/ci.yml` file. It is configured to run automatically on every push to the repository. The pipeline executes the `make all` target, which runs the following critical stages in order:
-
-1.  **Install Dependencies:** `make install` (`uv sync`)
-2.  **Format Check:** `make format` (Black)
-3.  **Lint Check:** `make lint` (Pylint)
-4.  **Run Tests:** `make test` (Pytest with Coverage)
+### Automated Pipeline (CICD.yml)
+The pipeline executes the full lifecycle of the application:
+1. Build: Runs `make install`, `make format`, `make lint`, and `make test`.
+2. Deploy API (`deploy` job):
+   - Logs into Docker Hub using secrets.
+   - Builds, tags, and pushes the new Docker image (`mlops-lab2-api:latest`).
+   - Triggers the Render deployment hook.
+3. Deploy GUI (`deploy-hf` job):
+   - Switches to the `hf-space` branch.
+   - Pushes the `app.py` and `requirements.txt` to the Hugging Face Space.
 
 ### Makefile Commands
-
-The `Makefile` defines the necessary automation targets used by the CI pipeline:
+The `Makefile` defines the necessary automation targets used by the CI/CD pipeline:
 
 | Target | Command | Purpose |
 | :--- | :--- | :--- |
