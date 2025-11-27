@@ -23,8 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build   # it is not executed if build fails
     env:
-          DOCKER_IMAGE_NAME: mlops-lab2-api
-          DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+          DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/mlops-lab2-api:latest
           RENDER_HOOK_BASE_URL: https://api.render.com/deploy/srv-d4k8t763jp1c738macvg?key=
     
     steps:
