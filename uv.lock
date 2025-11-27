@@ -306,7 +306,7 @@ wheels = [
 ]
 
 [[package]]
-name = "mlops-lab1"
+name = "mlops-lab2"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
